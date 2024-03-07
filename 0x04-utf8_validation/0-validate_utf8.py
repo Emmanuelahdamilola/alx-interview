@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+
+
 def validUTF8(data):
     """
     Determines if a given data set represents a valid UTF-8 encoding.
@@ -30,4 +32,3 @@ def validUTF8(data):
 
     # If there are still bytes to follow, it's invalid
     return bytes_to_follow == 0
-
