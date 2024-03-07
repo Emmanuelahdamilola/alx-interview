@@ -1,33 +1,42 @@
 #!/usr/bin/python3
 
+
 def validUTF8(data):
-    # Helper function to check if a given byte is a valid start of a UTF-8 character
-    def is_start_of_char(byte):
-        return (byte & 0b10000000) == 0b00000000 or (byte & 0b11100000) == 0b11000000 or (byte & 0b11110000) == 0b11100000 or (byte & 0b11111000) == 0b11110000
+    # Number of bytes in the current UTF-8 character
+    num_bytes = 0
 
-    # Variable to keep track of remaining bytes for a multi-byte character
-    remaining_bytes = 0
+    # Mask to check the 2 most significant bits in a byte
+    mask1 = 1 << 7
+    mask2 = 1 << 6
 
-    # Iterate through each byte in the data
+    # Check each byte in the data
     for byte in data:
-        # If it's the start of a new character
-        if remaining_bytes == 0:
-            if not is_start_of_char(byte):
+        # Mask to check the 3 most significant bits in a byte
+        mask = 1 << 7
+
+        # If this byte is the start of a new UTF-8 character
+        if num_bytes == 0:
+            # Count the number of leading 1s in the byte
+            while mask & byte:
+                num_bytes += 1
+                mask = mask >> 1
+
+            # If this is not a valid UTF-8 character start byte
+            if num_bytes == 0:
+                continue
+
+            # A UTF-8 character can be 1 to 4 bytes long
+            if num_bytes == 1 or num_bytes > 4:
                 return False
 
-            # Determine the number of remaining bytes for this character
-            if (byte & 0b11100000) == 0b11000000:
-                remaining_bytes = 1
-            elif (byte & 0b11110000) == 0b11100000:
-                remaining_bytes = 2
-            elif (byte & 0b11111000) == 0b11110000:
-                remaining_bytes = 3
         else:
-            # If it's a continuation byte
-            if (byte & 0b11000000) == 0b10000000:
-                remaining_bytes -= 1
-            else:
+            # Check if the byte is following the format 10xxxxxx
+            if not (byte & mask1 and not (byte & mask2)):
                 return False
 
-    # Check if there are remaining bytes at the end of the data
-    return remaining_bytes == 0
+        # Decrease the number of remaining bytes for this character
+        num_bytes -= 1
+
+    # If all bytes are valid UTF-8 characters
+    return num_bytes == 0
+
