@@ -1,62 +1,33 @@
 #!/usr/bin/python3
 
-
 def validUTF8(data):
-    """
-    Check if a given data set represents a valid UTF-8 encoding.
+    # Helper function to check if a given byte is a valid start of a UTF-8 character
+    def is_start_of_char(byte):
+        return (byte & 0b10000000) == 0b00000000 or (byte & 0b11100000) == 0b11000000 or (byte & 0b11110000) == 0b11100000 or (byte & 0b11111000) == 0b11110000
 
-    Parameters:
-    - data (list): A list of integers representing the bytes of the data set.
-                  Each integer represents 1 byte of data, focusing on the 8 least significant bits.
-
-    Returns:
-    - bool: True if data is a valid UTF-8 encoding, False otherwise.
-
-    UTF-8 Encoding Rules:
-    - A character in UTF-8 can be 1 to 4 bytes long.
-    - The data set can contain multiple characters.
-    - Each integer represents 1 byte of data, and only the 8 least significant bits are considered.
-
-    Algorithm Overview:
-    - Iterate through each integer in the data set.
-    - Check if the integer is within the valid range (1 to 4 bytes).
-    - For the first byte of a character:
-        - Count the number of leading 1s in the binary representation to determine the number of remaining bytes.
-        - Validate the start byte and decrement the remaining bytes for the start byte.
-    - For continuation bytes:
-        - Check if the current byte is a valid continuation byte.
-        - Decrement the remaining bytes for continuation bytes.
-    - Return True if all bytes are processed and no remaining bytes, else return False.
-    """
-
-    # Initialize a variable to keep track of the number of remaining bytes
+    # Variable to keep track of remaining bytes for a multi-byte character
     remaining_bytes = 0
 
-    # Iterate through each integer in the data
-    for num in data:
-        # Check if the integer is within the valid range (1 to 4 bytes)
-        if num < 0 or num > 255:
-            return False
-
-        # If no remaining bytes, check the first byte
+    # Iterate through each byte in the data
+    for byte in data:
+        # If it's the start of a new character
         if remaining_bytes == 0:
-            # Count the number of leading 1s in the binary representation
-            mask = 1 << 7
-            while mask & num:
-                remaining_bytes += 1
-                mask >>= 1
-
-            # Invalid start byte
-            if remaining_bytes == 1 or remaining_bytes > 4:
+            if not is_start_of_char(byte):
                 return False
 
-            # Decrement the remaining bytes for the start byte
-            remaining_bytes -= 1
+            # Determine the number of remaining bytes for this character
+            if (byte & 0b11100000) == 0b11000000:
+                remaining_bytes = 1
+            elif (byte & 0b11110000) == 0b11100000:
+                remaining_bytes = 2
+            elif (byte & 0b11111000) == 0b11110000:
+                remaining_bytes = 3
         else:
-            # Check if the current byte is a continuation byte
-            if (num >> 6) != 2:
+            # If it's a continuation byte
+            if (byte & 0b11000000) == 0b10000000:
+                remaining_bytes -= 1
+            else:
                 return False
-            remaining_bytes -= 1
 
-    # All bytes processed, and no remaining bytes
+    # Check if there are remaining bytes at the end of the data
     return remaining_bytes == 0
