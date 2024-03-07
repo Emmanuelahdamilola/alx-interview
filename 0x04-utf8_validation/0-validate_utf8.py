@@ -3,32 +3,60 @@
 
 def validUTF8(data):
     """
-    Determines if a given data set represents a valid UTF-8 encoding.
-    :param data: list of integers representing bytes of data
-    :return: True if data is a valid UTF-8 encoding, else return False
+    Check if a given data set represents a valid UTF-8 encoding.
+
+    Parameters:
+    - data (list): A list of integers representing the bytes of the data set.
+                  Each integer represents 1 byte of data, focusing on the 8 least significant bits.
+
+    Returns:
+    - bool: True if data is a valid UTF-8 encoding, False otherwise.
+
+    UTF-8 Encoding Rules:
+    - A character in UTF-8 can be 1 to 4 bytes long.
+    - The data set can contain multiple characters.
+    - Each integer represents 1 byte of data, and only the 8 least significant bits are considered.
+
+    Algorithm Overview:
+    - Iterate through each integer in the data set.
+    - Check if the integer is within the valid range (1 to 4 bytes).
+    - For the first byte of a character:
+        - Count the number of leading 1s in the binary representation to determine the number of remaining bytes.
+        - Validate the start byte and decrement the remaining bytes for the start byte.
+    - For continuation bytes:
+        - Check if the current byte is a valid continuation byte.
+        - Decrement the remaining bytes for continuation bytes.
+    - Return True if all bytes are processed and no remaining bytes, else return False.
     """
-    # Count of bytes to follow for the current byte
-    bytes_to_follow = 0
 
-    for byte in data:
-        # Check if the byte is a continuation byte
-        if bytes_to_follow:
-            # If the byte doesn't start with 10xxxxxx, it's invalid
-            if byte >> 6 != 0b10:
+    # Initialize a variable to keep track of the number of remaining bytes
+    remaining_bytes = 0
+
+    # Iterate through each integer in the data
+    for num in data:
+        # Check if the integer is within the valid range (1 to 4 bytes)
+        if num < 0 or num > 255:
+            return False
+
+        # If no remaining bytes, check the first byte
+        if remaining_bytes == 0:
+            # Count the number of leading 1s in the binary representation
+            mask = 1 << 7
+            while mask & num:
+                remaining_bytes += 1
+                mask >>= 1
+
+            # Invalid start byte
+            if remaining_bytes == 1 or remaining_bytes > 4:
                 return False
-            bytes_to_follow -= 1
+
+            # Decrement the remaining bytes for the start byte
+            remaining_bytes -= 1
         else:
-            # Determine the number of bytes to follow for this byte
-            if byte >> 7 == 0:
-                bytes_to_follow = 0
-            elif byte >> 5 == 0b110:
-                bytes_to_follow = 1
-            elif byte >> 4 == 0b1110:
-                bytes_to_follow = 2
-            elif byte >> 3 == 0b11110:
-                bytes_to_follow = 3
-            else:
+            # Check if the current byte is a continuation byte
+            if (num >> 6) != 2:
                 return False
+            remaining_bytes -= 1
 
-    # If there are still bytes to follow, it's invalid
-    return bytes_to_follow == 0
+    # All bytes processed, and no remaining bytes
+    return remaining_bytes == 0
