@@ -1,42 +1,31 @@
 #!/usr/bin/python3
+"""
+This program determines if a data set represents valid UTF-8 encoding.
+"""
 
 
 def validUTF8(data):
-    # Number of bytes in the current UTF-8 character
-    num_bytes = 0
+    """
+    Determine if data has valid UTF-8 encoding.
 
-    # Mask to check the 2 most significant bits in a byte
-    mask1 = 1 << 7
-    mask2 = 1 << 6
 
-    # Check each byte in the data
-    for byte in data:
-        # Mask to check the 3 most significant bits in a byte
-        mask = 1 << 7
+    Args:
+        data (list): A list of integers representing a data set.
 
-        # If this byte is the start of a new UTF-8 character
-        if num_bytes == 0:
-            # Count the number of leading 1s in the byte
-            while mask & byte:
-                num_bytes += 1
-                mask = mask >> 1
+    Returns:
+        bool: True if the data has valid UTF-8 encoding, False otherwise.
+    """
+    # Clean each byte by retaining only the 8 least significant bits.
+    cleaned_bytes = [raw_byte & 0b11111111 for raw_byte in data]
 
-            # If this is not a valid UTF-8 character start byte
-            if num_bytes == 0:
-                continue
+    # Convert the cleaned bytes to a byte object.
+    byte_data = bytes(cleaned_bytes)
 
-            # A UTF-8 character can be 1 to 4 bytes long
-            if num_bytes == 1 or num_bytes > 4:
-                return False
+    # Attempt to decode the byte data.
+    try:
+        byte_data.decode()
+    except UnicodeDecodeError:
+        # If decoding fails, return False indicating invalid UTF-8 encoding.
+        return False
 
-        else:
-            # Check if the byte is following the format 10xxxxxx
-            if not (byte & mask1 and not (byte & mask2)):
-                return False
-
-        # Decrease the number of remaining bytes for this character
-        num_bytes -= 1
-
-    # If all bytes are valid UTF-8 characters
-    return num_bytes == 0
-
+    return True
