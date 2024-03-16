@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-""" 
+"""
 Calculate the minimum operations necessary to duplicate a given character
 to appear n times.
 """
 
 
 def minOperations(n):
-    """ 
+    """
     Calculate the minimum operations necessary to duplicate a given character
     to appear n times.
     """
