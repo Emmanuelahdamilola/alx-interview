@@ -1,31 +1,29 @@
 #!/usr/bin/python3
+""" 
+Calculate the minimum operations necessary to duplicate a given character
+to appear n times.
+"""
 
-def minOperations(n: int) -> int:
+
+def minOperations(n):
+    """ 
+    Calculate the minimum operations necessary to duplicate a given character
+    to appear n times.
     """
-    Calculate the fewest number of operations needed to result in n H chars.
+    operation_count = 0
+    character = 'H'
+    buffer = ''
 
-    :param n: Target number of H characters
-    :type n: int
-    :return: The min number of operations needed to reach n H character, or 0
-    :rtype: int
-    """
+    while len(character) < n:
 
-    if n <= 1:
-        return 0
+        # If target size n is cleanly divisible by current size
+        if n % len(character) == 0:
+            # Copy character contents to buffer
+            buffer = character
+            operation_count += 1
 
-    operations = 0
-    current = 1
-    clipboard = 0
+        # Paste buffer to character
+        character += buffer
+        operation_count += 1
 
-    while current < n:
-        if n % current == 0:
-            # Use Copy All followed by Paste (n // current - 1) times
-            operations += n // current
-            clipboard = current
-            current *= n // current
-        else:
-            # Use Paste to increase the current count
-            operations += 1
-            current += clipboard
-
-    return operations
+    return operation_count
