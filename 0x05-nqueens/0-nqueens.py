@@ -1,12 +1,13 @@
 #!/usr/bin/python3
-""" 
+"""
 Determines how to safely position N queens on a board of size N.
 """
 
 import sys
 
+
 def solve_recursively(board, column):
-    """ 
+    """
     Safely place queens column by column.
     The function will continue to backtrack,
     even after a solution is printed, until
@@ -31,8 +32,9 @@ def solve_recursively(board, column):
             # Backtrack
             board[row][column] = 0
 
+
 def validate_placement(board, column, row):
-    """ 
+    """
     Determine if the queen can safely be placed.
     """
 
@@ -57,8 +59,9 @@ def validate_placement(board, column, row):
 
     return True
 
+
 def print_solution(board, size):
-    """ 
+    """
     Prints solution of safe queen placement.
     """
 
@@ -71,8 +74,9 @@ def print_solution(board, size):
 
     print(placements)
 
+
 def validate_args(args):
-    """ 
+    """
     Validate user arguments.
     """
 
@@ -93,12 +97,14 @@ def validate_args(args):
         print('N must be at least 4')
         sys.exit(1)
 
+
 def print_board(board):
-    """ 
+    """
     Print board for debugging.
     """
     for row in board:
         print(row)
+
 
 # Assign and validate user args
 validate_args(sys.argv)
