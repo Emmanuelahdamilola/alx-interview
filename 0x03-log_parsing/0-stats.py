@@ -1,12 +1,14 @@
 #!/usr/bin/python3
-""" 
+"""
 A program to ingest and track logs, periodically printing statistics.
 """
 
+
 from sys import stdin, exit
 
+
 def print_code_tracking(total_file_size, code_tracker):
-    """ 
+    """
     Print formatted log statistics.
     """
     # Print total size of data passed to date
@@ -18,6 +20,7 @@ def print_code_tracking(total_file_size, code_tracker):
     for code in code_list:
         if code_tracker[code] != 0:
             print(code + ': ' + str(code_tracker[code]))
+
 
 code_tracker = {
     '200': 0, '301': 0, '400': 0, '401': 0,
