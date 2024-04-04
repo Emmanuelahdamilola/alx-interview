@@ -3,6 +3,7 @@
 This script calculates the fewest number of coins required to meet a given amount.
 """
 
+
 def makeChange(coins, total):
     """
     Calculate the fewest number of coins needed to meet a given amount.
