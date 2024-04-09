@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Island Perimeter Finder.
 
-This script calculates the perimeter of an "island" represented by 1s 
+This script calculates the perimeter of an "island" represented by 1s
 surrounded by "ocean" represented by 0s in a 2D grid.
 
 """
@@ -11,7 +11,7 @@ def island_perimeter(grid):
     """Calculate the perimeter of an island.
 
     Args:
-        grid_map (list of lists of ints): 2D list representation of the island map,
+        grid (list of lists of ints): 2D list representation of the island map,
             with 1s representing "land" and 0s representing "water".
 
     Returns:
@@ -31,4 +31,3 @@ def island_perimeter(grid):
                 if row == len(grid) - 1 or not grid[row + 1][col]:
                     perimeter += 1
     return perimeter
-
