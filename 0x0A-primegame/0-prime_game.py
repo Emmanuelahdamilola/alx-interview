@@ -1,94 +1,77 @@
 #!/usr/bin/python3
-"""Prime Game
-"""
+"""Prime Game"""
+
+
+def findPrimesToN(n):
+    """Returns list of primes up to parameter value n, in ascending order.
+
+    Args:
+        n (int): upper bound on list of primes returned
+
+    Return:
+        primes (list) of (int): list of primes to n, or
+        (None): on failure
+
+    """
+
+    if (type(n) is not int or n < 0):
+        return None
+
+    # logically primes should be a set, but we want it to remain ordered
+    primes = []
+    for candidate in range(2, n + 1):
+        prime = True
+        for divisor in range(2, candidate):
+            if (candidate % divisor == 0):
+                prime = False
+                break
+        if (prime):
+            primes.append(candidate)
+    return primes
 
 
 def isWinner(x, nums):
-    """
-    Determine the winner of games where players remove prime numbers
+    """Determine the winner of games where players remove prime numbers
     and their multiples from a set of consecutive integers.
 
     Args:
     - x (int): The number of rounds/games to be played.
-    - nums: list of integers representing the upper bounds for each round
+    - nums: A list of integers representing the upper bounds for each round.
 
     Returns:
     - str or None: The name of the player who won the most rounds,
       or None if the winner cannot be determined.
+
     """
+    if (type(nums) is not list or not all([type(n) is int for n in nums]) or
+            not all([n > -1 for n in nums])):
+        return None
 
-    def is_prime(num):
-        """
-        Check if a number is prime.
+    if (type(x) is not int or x != len(nums)):
+        return None
 
-        Args:
-        - num (int): The number to check.
+    nums.sort()
+    primes = findPrimesToN(nums[-1])
+    if (primes is None):
+        return None
 
-        Returns:
-        - bool: True if the number is prime, False otherwise.
-        """
-        if num < 2:
-            return False
-        for i in range(2, int(num ** 0.5) + 1):
-            if num % i == 0:
-                return False
-        return True
-
-    def next_prime(start):
-        """
-        Find the next prime number starting from a given number.
-
-        Args:
-        - start (int): The starting number.
-
-        Returns:
-        - int: The next prime number after 'start'.
-        """
-        while True:
-            if is_prime(start):
-                return start
-            start += 1
-
-    def winner(n):
-        """
-        Simulate the game for a given upper bound and determine the winner.
-
-        Args:
-        - n (int): The upper bound of consecutive integers for the game.
-
-        Returns:
-        - int: 0 for Maria's win, 1 for Ben's win.
-        """
-        primes = [True] * (n + 1)
-        primes[0] = primes[1] = False
-
-        for i in range(2, int(n ** 0.5) + 1):
-            if primes[i]:
-                for j in range(i * i, n + 1, i):
-                    primes[j] = False
-
-        primes = [i for i in range(n + 1) if primes[i]]
-
-        turn = 0
-        while n > 0:
-            n -= next_prime(n)
-            turn = 1 - turn
-
-        return turn
-
-    maria_wins = 0
-    ben_wins = 0
-
+    Maria_wins = 0
+    Ben_wins = 0
     for n in nums:
-        result = winner(n)
-        if result == 0:
-            maria_wins += 1
-        elif result == 1:
-            ben_wins += 1
+        prime_ct = 0
+        for prime in primes:
+            if (prime <= n):
+                prime_ct += 1
+            else:
+                break
+        if prime_ct % 2 == 0:
+            Ben_wins += 1
+        else:
+            Maria_wins += 1
 
-    if maria_wins > ben_wins:
+    if (Maria_wins > Ben_wins):
         return "Maria"
-    elif ben_wins > maria_wins:
+    elif (Ben_wins > Maria_wins):
         return "Ben"
     else:
         return None
